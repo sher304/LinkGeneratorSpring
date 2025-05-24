@@ -51,6 +51,9 @@ public class LinkGenerateService {
         if (!link.isPresent()) return Optional.empty();
 
         Link saveLink = link.get();
+        if (!saveLink.getPassword().equals(linkRequestDTO.getPassword())) {
+            return Optional.empty();
+        }
         if (linkRequestDTO.getName() != null) saveLink.setName(linkRequestDTO.getName());
         if (linkRequestDTO.getPassword() != null) saveLink.setPassword(linkRequestDTO.getPassword());
         if (linkRequestDTO.getTargetURL() != null) saveLink.setTargetURL(linkRequestDTO.getTargetURL());

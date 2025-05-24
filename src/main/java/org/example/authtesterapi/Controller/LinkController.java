@@ -11,11 +11,13 @@ import org.example.authtesterapi.Model.Link;
 import org.example.authtesterapi.Model.LinkRequestDTO;
 import org.example.authtesterapi.Model.LinkResponseDTO;
 import org.example.authtesterapi.Service.LinkGenerateService;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.net.URI;
+import java.util.NoSuchElementException;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -63,7 +65,9 @@ public class LinkController {
             LinkResponseDTO linkResponseDTO = linkGenerateService.getLink(id).orElseThrow();
             LinkRequestDTO linkRequestDTO = applyPatch(linkResponseDTO, patch);
             linkGenerateService.updateLink(id, linkRequestDTO).orElseThrow();
-        } catch (JsonPatchException | JsonProcessingException e) {
+        } catch (JsonPatchException | JsonProcessingException | EmptyResultDataAccessException e) {
+            return ResponseEntity.internalServerError().build();
+        } catch (NoSuchElementException ex) {
             return ResponseEntity.notFound().build();
         }
         return ResponseEntity.noContent().build();
