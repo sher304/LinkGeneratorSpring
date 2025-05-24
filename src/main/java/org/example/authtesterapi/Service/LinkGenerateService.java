@@ -47,19 +47,14 @@ public class LinkGenerateService {
 
     public Optional<LinkResponseDTO> updateLink(String id, LinkRequestDTO linkRequestDTO) {
         Optional<Link> link = linkRepository.findById(id);
-        System.out.println("THE ID: \n" + link.get().getId());
         if (!link.isPresent()) return Optional.empty();
 
-        Link saveLink = link.get();
-        if (!saveLink.getPassword().equals(linkRequestDTO.getPassword())) {
-            return Optional.empty();
-        }
-        if (linkRequestDTO.getName() != null) saveLink.setName(linkRequestDTO.getName());
-        if (linkRequestDTO.getPassword() != null) saveLink.setPassword(linkRequestDTO.getPassword());
-        if (linkRequestDTO.getTargetURL() != null) saveLink.setTargetURL(linkRequestDTO.getTargetURL());
+        if (linkRequestDTO.getName() != null) link.get().setName(linkRequestDTO.getName());
+        if (linkRequestDTO.getPassword() != null) link.get().setPassword(linkRequestDTO.getPassword());
+        if (linkRequestDTO.getTargetURL() != null) link.get().setTargetURL(linkRequestDTO.getTargetURL());
 
-        linkRepository.save(saveLink);
-        return Optional.of(linkDTOMapper.map(saveLink));
+        linkRepository.save(link.get());
+        return Optional.of(linkDTOMapper.map(link.get()));
     }
 
     private String newLinkGenerator() {

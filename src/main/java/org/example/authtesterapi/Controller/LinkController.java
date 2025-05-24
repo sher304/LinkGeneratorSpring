@@ -64,6 +64,7 @@ public class LinkController {
         try {
             LinkResponseDTO linkResponseDTO = linkGenerateService.getLink(id).orElseThrow();
             LinkRequestDTO linkRequestDTO = applyPatch(linkResponseDTO, patch);
+            if (linkResponseDTO.getPassword().isEmpty() || !linkRequestDTO.getPassword().equals(linkResponseDTO.getPassword())) return ResponseEntity.status(403).header("reason", "wrong password").build();
             linkGenerateService.updateLink(id, linkRequestDTO).orElseThrow();
         } catch (JsonPatchException | JsonProcessingException | EmptyResultDataAccessException e) {
             return ResponseEntity.internalServerError().build();
