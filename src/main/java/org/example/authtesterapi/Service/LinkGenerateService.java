@@ -57,6 +57,10 @@ public class LinkGenerateService {
         return Optional.of(linkDTOMapper.map(link.get()));
     }
 
+    public void delete(String id) {
+        linkRepository.deleteById(id);
+    }
+
     private String newLinkGenerator() {
         return RANDOM.ints(10, 0, letters.length())
                 .mapToObj(letters::charAt)

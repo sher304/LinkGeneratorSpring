@@ -74,6 +74,20 @@ public class LinkController {
         return ResponseEntity.noContent().build();
     }
 
+    @DeleteMapping("api/v1/links/{id}")
+    public ResponseEntity<?> deleteLink(@PathVariable String id, @RequestBody LinkRequestDTO linkRequestDTO) {
+        try {
+            LinkResponseDTO linkResponseDTO = linkGenerateService.getLink(id).orElseThrow();
+            if (linkRequestDTO.getPassword().isEmpty() || !linkResponseDTO.getPassword().equals(linkRequestDTO.getPassword())) {
+                return ResponseEntity.status(403).header("reason", "wrong password").build();
+            }
+            linkGenerateService.delete(id);
+            return ResponseEntity.noContent().build();
+        } catch (NoSuchElementException ex) {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
     public LinkRequestDTO applyPatch(LinkResponseDTO responseDTO, JsonMergePatch patch) throws JsonPatchException, JsonProcessingException {
         JsonNode linkNode = objectMapper.valueToTree(responseDTO);
         JsonNode patchNode = patch.apply(linkNode);
