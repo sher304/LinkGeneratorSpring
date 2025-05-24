@@ -45,6 +45,20 @@ public class LinkGenerateService {
         return linkRepository.findById(id).map(linkDTOMapper::map);
     }
 
+    public Optional<LinkResponseDTO> updateLink(String id, LinkRequestDTO linkRequestDTO) {
+        Optional<Link> link = linkRepository.findById(id);
+        System.out.println("THE ID: \n" + link.get().getId());
+        if (!link.isPresent()) return Optional.empty();
+
+        Link saveLink = link.get();
+        if (linkRequestDTO.getName() != null) saveLink.setName(linkRequestDTO.getName());
+        if (linkRequestDTO.getPassword() != null) saveLink.setPassword(linkRequestDTO.getPassword());
+        if (linkRequestDTO.getTargetURL() != null) saveLink.setTargetURL(linkRequestDTO.getTargetURL());
+
+        linkRepository.save(saveLink);
+        return Optional.of(linkDTOMapper.map(saveLink));
+    }
+
     private String newLinkGenerator() {
         return RANDOM.ints(10, 0, letters.length())
                 .mapToObj(letters::charAt)

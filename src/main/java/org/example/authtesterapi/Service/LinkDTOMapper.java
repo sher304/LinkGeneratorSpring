@@ -31,7 +31,7 @@ public class LinkDTOMapper {
         linkResponseDTO.setName(link.getName());
         linkResponseDTO.setTargetURL(link.getTargetURL());
         linkResponseDTO.setPassword(link.getPassword());
-        linkResponseDTO.setRedirectURL("http://localhost:8080/api/v1/red/" + link.getId());
+        linkResponseDTO.setRedirectURL("http://localhost:8080/red/" + link.getId());
         linkResponseDTO.setVisits(link.getVisits());
         return linkResponseDTO;
     }
