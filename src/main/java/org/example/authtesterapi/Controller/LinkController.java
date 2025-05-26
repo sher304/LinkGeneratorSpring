@@ -34,10 +34,15 @@ public class LinkController {
 
     @PostMapping("/api/v1/links")
     public ResponseEntity<LinkResponseDTO> generateLink(@RequestBody LinkRequestDTO linkRequestDTO) {
-        LinkResponseDTO link = linkGenerateService.saveLink(linkRequestDTO);
-        URI generatedNewURI = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}")
-                .buildAndExpand(link.getName() + link.getTargetURL()).toUri();
-        return ResponseEntity.created(generatedNewURI).body(link);
+        LinkResponseDTO link = null;
+        try {
+            link = linkGenerateService.saveLink(linkRequestDTO);
+            URI generatedNewURI = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}")
+                    .buildAndExpand(link.getName() + link.getTargetURL()).toUri();
+            return ResponseEntity.created(generatedNewURI).body(link);
+        } catch (Exception e) {
+            return ResponseEntity.status(400).header("error", e.getMessage()).body(link);
+        }
     }
 
     @GetMapping("/api/v1/links/{id}")

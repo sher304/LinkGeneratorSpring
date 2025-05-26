@@ -1,32 +1,52 @@
 package org.example.authtesterapi.Service;
 
+import jakarta.validation.ConstraintViolation;
+import jakarta.validation.Validator;
 import org.example.authtesterapi.Model.Link;
 import org.example.authtesterapi.Model.LinkRequestDTO;
 import org.example.authtesterapi.Model.LinkResponseDTO;
 import org.example.authtesterapi.Repository.LinkRepository;
 import org.springframework.stereotype.Service;
 
-import javax.swing.text.html.Option;
 import java.security.SecureRandom;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
+
 
 @Service
 public class LinkGenerateService {
 
     private LinkRepository linkRepository;
     private LinkDTOMapper linkDTOMapper;
+    private final Validator validator;
+
     private String letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
     private SecureRandom RANDOM = new SecureRandom();
 
-    public LinkGenerateService(LinkRepository linkRepository, LinkDTOMapper linkDTOMapper) {
+
+    public LinkGenerateService(LinkRepository linkRepository,
+                               LinkDTOMapper linkDTOMapper,
+                               Validator validator) {
         this.linkRepository = linkRepository;
         this.linkDTOMapper = linkDTOMapper;
+        this.validator = validator;
     }
 
-    public LinkResponseDTO saveLink(LinkRequestDTO linkRequestDTO) {
-        Link link = linkRepository.save(linkDTOMapper.map(linkRequestDTO, newLinkGenerator()));
-        return linkDTOMapper.map(link);
+    public LinkResponseDTO saveLink(LinkRequestDTO linkRequestDTO) throws Exception {
+        Link link = linkDTOMapper.map(linkRequestDTO);
+        Set<ConstraintViolation<Link>> errors = validator.validate(link);
+        if (errors.isEmpty()) {
+            link = linkDTOMapper.map(linkRequestDTO, newLinkGenerator());
+            return linkDTOMapper.map(link);
+        } else {
+            System.out.println("Cannot add Link object! Errors:");
+            String message = errors.stream()
+                    .map(violation -> violation.getPropertyPath() + ": " + violation.getMessage())
+                    .collect(Collectors.joining("; "));
+
+            throw new Exception("Validation failed: " + message);
+        }
     }
 
     public Optional<LinkResponseDTO> increaseVisits(String id) {
