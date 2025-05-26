@@ -3,6 +3,8 @@ package org.example.authtesterapi.Model;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.validation.constraints.Size;
+import org.example.authtesterapi.Constraint.PasswordProtocol;
+import org.example.authtesterapi.Constraint.URLCorrectnessProtocol;
 import org.example.authtesterapi.Constraint.URLNotFromDomain;
 
 @Entity
@@ -12,7 +14,9 @@ public class Link {
     @Size(min = 2, max = 20, message = "Name must be greater than 2 and less than 20")
     private String name;
     @URLNotFromDomain
+    @URLCorrectnessProtocol
     private String targetURL;
+    @PasswordProtocol
     private String password;
     private int visits;
 
