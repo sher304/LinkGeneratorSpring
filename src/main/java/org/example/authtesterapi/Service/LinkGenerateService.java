@@ -36,15 +36,17 @@ public class LinkGenerateService {
     public LinkResponseDTO saveLink(LinkRequestDTO linkRequestDTO) throws Exception {
         Link link = linkDTOMapper.map(linkRequestDTO);
         Set<ConstraintViolation<Link>> errors = validator.validate(link);
+        if (linkRepository.existsByTargetURL(linkRequestDTO.getTargetURL())) {
+            throw new Exception("Link already exists");
+        }
         if (errors.isEmpty()) {
-            link = linkDTOMapper.map(linkRequestDTO, newLinkGenerator());
+            link = linkRepository.save(linkDTOMapper.map(linkRequestDTO, newLinkGenerator()));
             return linkDTOMapper.map(link);
         } else {
             System.out.println("Cannot add Link object! Errors:");
             String message = errors.stream()
                     .map(violation -> violation.getPropertyPath() + ": " + violation.getMessage())
                     .collect(Collectors.joining("; "));
-
             throw new Exception("Validation failed: " + message);
         }
     }
